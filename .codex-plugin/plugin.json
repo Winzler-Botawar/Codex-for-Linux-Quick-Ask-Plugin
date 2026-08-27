@@ -1,0 +1,38 @@
+{
+  "name": "codex-selection-explainer",
+  "version": "0.1.0",
+  "description": "Floating explainer for selected text inside Codex Desktop on Linux.",
+  "author": {
+    "name": "Winzler-Botawar",
+    "url": "https://github.com/Winzler-Botawar"
+  },
+  "homepage": "https://github.com/Winzler-Botawar/Codex-for-Linux-Quick-Ask-Plugin",
+  "repository": "https://github.com/Winzler-Botawar/Codex-for-Linux-Quick-Ask-Plugin",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "selection",
+    "explainer",
+    "floating"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex Selection Explainer",
+    "shortDescription": "解释 Codex 中选中的文字",
+    "longDescription": "在 Codex Linux 桌面端选中文字后显示“这是什么”浮窗，点击后调用本机 Codex CLI 给出简短解释。浮窗可拖动、可递归解释，并且只通过关闭按钮关闭。",
+    "developerName": "Winzler-Botawar",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/Winzler-Botawar/Codex-for-Linux-Quick-Ask-Plugin",
+    "privacyPolicyURL": "https://openai.com/policies/row-privacy-policy/",
+    "termsOfServiceURL": "https://openai.com/policies/row-terms-of-use/",
+    "defaultPrompt": "启动或停止 Codex Selection Explainer，并检查本机浮窗服务状态。",
+    "brandColor": "#0F766E",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
+  }
+}

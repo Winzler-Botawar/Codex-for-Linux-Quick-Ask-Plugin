@@ -1,0 +1,13 @@
+# Local helper state
+config.json
+codex-home/
+workspace/
+*.log
+*.err
+*.pid
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
