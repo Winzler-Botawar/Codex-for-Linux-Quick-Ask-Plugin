@@ -4,6 +4,8 @@
 `0.1.0`。
 
 ## 功能
+<img width="226" height="92" alt="image" src="https://github.com/user-attachments/assets/2a358065-aca1-4d01-b736-5fe3fa081deb" />
+<img width="577" height="310" alt="image" src="https://github.com/user-attachments/assets/8e7bde87-1a8a-4799-8dc0-c1faec63451d" />
 
 - 选中文字后，在选区旁显示“这是什么”按钮。
 - 点击后打开可拖动的解释浮窗。
