@@ -21,9 +21,14 @@ else
   exit 1
 fi
 
-mkdir -p "$DEST_DIR/src" "$DEST_DIR/assets"
+mkdir -p "$DEST_DIR/src" "$DEST_DIR/assets" "$DEST_DIR/vendor/katex/fonts"
 cp "$SOURCE_DIR/src/server.mjs" "$SOURCE_DIR/src/renderer.js" "$DEST_DIR/src/"
 cp "$SOURCE_DIR/assets/icon.png" "$DEST_DIR/assets/" 2>/dev/null || true
+cp "$SOURCE_DIR/vendor/katex/katex.min.js" \
+  "$SOURCE_DIR/vendor/katex/katex.min.css" \
+  "$SOURCE_DIR/vendor/katex/LICENSE" \
+  "$DEST_DIR/vendor/katex/"
+cp "$SOURCE_DIR"/vendor/katex/fonts/*.woff2 "$DEST_DIR/vendor/katex/fonts/"
 
 if [ ! -f "$DEST_DIR/config.json" ]; then
   cat > "$DEST_DIR/config.json" <<EOF

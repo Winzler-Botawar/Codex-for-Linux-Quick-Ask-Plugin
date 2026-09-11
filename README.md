@@ -1,7 +1,7 @@
 # Codex for Linux Quick Ask Plugin
 
 在 Codex Linux Desktop 中选中文字后快速查看解释的本地插件，当前版本为
-`0.1.0`。
+`0.1.1`。
 
 ## 功能
 <img width="226" height="92" alt="image" src="https://github.com/user-attachments/assets/2a358065-aca1-4d01-b736-5fe3fa081deb" />
@@ -12,6 +12,8 @@
 - 点击页面空白处不会关闭浮窗，只能点击右上角关闭按钮。
 - 在解释浮窗内再次选中文字，可以创建新的解释浮窗，旧浮窗保持打开。
 - 解释请求携带当前对话上下文和选区附近文本，并在前端实时流式显示。
+- 解释中的 `$...$`、`$$...$$`、`\(...\)`、`\[...\]` 公式会使用随插件
+  分发的 KaTeX 在本地渲染，不依赖外部 CDN；解析失败时保留原始公式文本。
 - 界面支持中文、英语、日语、韩语、法语、德语、西班牙语、俄语、
   葡萄牙语和意大利语。
 - 输出语言默认跟随选中文字语言；代码、标识符等内容默认使用当前界面语言。
@@ -144,3 +146,6 @@ Codex Desktop 的公开插件接口目前不直接提供向聊天页面注入浮
 ## 许可证
 
 本项目使用 MIT License，详见 [LICENSE](LICENSE)。
+
+内置的 KaTeX 使用 MIT License，许可证文本位于
+[`vendor/katex/LICENSE`](vendor/katex/LICENSE)。

@@ -39,6 +39,14 @@ async function main() {
         return;
       }
 
+      if (
+        req.method === "GET"
+        && req.url.startsWith("/vendor/katex/fonts/")
+      ) {
+        await writeKatexFont(req.url, res);
+        return;
+      }
+
       if (req.method === "POST" && req.url === "/explain") {
         const body = await readJsonBody(req);
         const text = await explain(body);
@@ -174,11 +182,25 @@ async function listTargets(port) {
 
 async function injectRenderer(target) {
   const appLanguage = await resolveAppLanguage();
-  const source = (await readFile(path.join(MODULE_DIR, "renderer.js"), "utf8"))
+  const [rendererTemplate, katexSource, katexCssText] = await Promise.all([
+    readFile(path.join(MODULE_DIR, "renderer.js"), "utf8"),
+    readFile(path.join(PROJECT_ROOT, "vendor", "katex", "katex.min.js"), "utf8"),
+    readFile(path.join(PROJECT_ROOT, "vendor", "katex", "katex.min.css"), "utf8"),
+  ]);
+  const helperOrigin = `http://127.0.0.1:${API_PORT}`;
+  const katexCss = katexCssText.replace(
+    /url\(fonts\//g,
+    `url(${helperOrigin}/vendor/katex/fonts/`,
+  );
+  const source = `${katexSource}\n${rendererTemplate
     .replace(
       'const APP_LANGUAGE = "__APP_LANGUAGE__";',
       `const APP_LANGUAGE = ${JSON.stringify(appLanguage || "")};`,
-    );
+    )
+    .replace(
+      'const KATEX_CSS = "__KATEX_CSS__";',
+      `const KATEX_CSS = ${JSON.stringify(katexCss)};`,
+    )}`;
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await openWebSocket(ws);
 
@@ -198,6 +220,33 @@ async function injectRenderer(target) {
     }
   } finally {
     ws.close();
+  }
+}
+
+async function writeKatexFont(url, res) {
+  let filename = "";
+  try {
+    filename = decodeURIComponent(url.slice("/vendor/katex/fonts/".length));
+  } catch {
+    writeJson(res, 400, { ok: false, error: "Invalid font path" });
+    return;
+  }
+  if (!/^KaTeX_[A-Za-z0-9_.-]+\.woff2$/.test(filename)) {
+    writeJson(res, 404, { ok: false, error: "Font not found" });
+    return;
+  }
+  try {
+    const body = await readFile(
+      path.join(PROJECT_ROOT, "vendor", "katex", "fonts", filename),
+    );
+    res.writeHead(200, {
+      "Content-Type": "font/woff2",
+      "Content-Length": body.length,
+      "Cache-Control": "public, max-age=31536000, immutable",
+    });
+    res.end(body);
+  } catch {
+    writeJson(res, 404, { ok: false, error: "Font not found" });
   }
 }
 
@@ -382,6 +431,15 @@ function buildExplanationPrompt(request) {
   const question = String(request?.question || "这是什么").trim() || "这是什么";
   const outputLanguage = String(request?.outputLanguage || "input").trim() || "input";
   const uiLanguage = String(context.appLanguage || "zh-CN").trim() || "zh-CN";
+  const history = Array.isArray(request?.history)
+    ? request.history
+      .filter((turn) => turn && typeof turn === "object")
+      .slice(-6)
+      .map((turn) => ({
+        question: limitText(turn.question, 1200),
+        answer: limitText(turn.answer, 2400),
+      }))
+    : [];
   const conversation = limitText(context.conversation, 12000);
   const nearby = limitText(context.nearby, 6000);
   const languageInstruction = outputLanguage === "input"
@@ -394,6 +452,7 @@ function buildExplanationPrompt(request) {
     "- 必须结合当前 Codex 对话上下文和选区附近文本来理解划选文字，不要孤立解释这个词本身。",
     "- 解释要落到当前对话正在讨论的任务、代码、问题或主题中。",
     "- 先给出结论，再用 2 到 4 句简短说明。",
+    "- 如果这是对之前回答的追问，直接回答当前追问，并结合浮窗内的问答历史；不要机械重复之前的回答。",
     "- 如果语境不完整，明确说明哪些部分是推测。",
     "- 不要执行工具，不要读取或修改用户文件。",
     "- 回答控制在 250 字以内。",
@@ -415,6 +474,11 @@ function buildExplanationPrompt(request) {
     nearby || "未提供",
     "NEARBY_CONTEXT>>>",
     "",
+    "当前浮窗内之前的问答历史（可能为空）：",
+    "<<<FLOATING_WINDOW_HISTORY",
+    formatHistory(history),
+    "FLOATING_WINDOW_HISTORY>>>",
+    "",
     "页面上下文：",
     `标题：${context.title || "未提供"}`,
     `URL：${context.url || "未提供"}`,
@@ -422,6 +486,16 @@ function buildExplanationPrompt(request) {
   ].join("\n");
 
   return prompt;
+}
+
+function formatHistory(history) {
+  if (!history.length) {
+    return "无";
+  }
+  return history.map((turn, index) => [
+    `第 ${index + 1} 轮用户问题：${turn.question || "未提供"}`,
+    `第 ${index + 1} 轮助手回答：${turn.answer || "未提供"}`,
+  ].join("\n")).join("\n\n");
 }
 
 function limitText(value, maxLength) {

@@ -18,6 +18,10 @@ backend is implemented by `src/server.mjs`.
 - The popup remains open until its close button is clicked.
 - Selecting text inside an explanation popup shows the same button and can open
   a new popup while the original popup remains visible.
+- Each popup has its own follow-up input. Follow-up answers are appended to that
+  popup and include only that popup's previous question-and-answer history.
+- Inline and display LaTeX formulas are rendered locally with the bundled KaTeX
+  assets; invalid formulas fall back to their original text.
 
 ## Install
 
