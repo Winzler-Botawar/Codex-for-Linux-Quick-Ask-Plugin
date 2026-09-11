@@ -12,6 +12,7 @@ const DEFAULT_CONFIG_PATH = path.join(PROJECT_ROOT, "config.json");
 const DEFAULT_WORKSPACE = path.join(PROJECT_ROOT, "workspace");
 const DEFAULT_TIMEOUT_MS = 120000;
 const CDP_TIMEOUT_MS = 8000;
+const RENDERER_VERSION = "0.1.3";
 
 const args = parseArgs(process.argv.slice(2));
 const API_PORT = Number(args.port || 34891);
@@ -189,10 +190,14 @@ async function injectRenderer(target) {
   ]);
   const helperOrigin = `http://127.0.0.1:${API_PORT}`;
   const katexCss = katexCssText.replace(
-    /url\(fonts\//g,
-    `url(${helperOrigin}/vendor/katex/fonts/`,
+    /src:url\(fonts\/([^)]+\.woff2)\)[^}]*/g,
+    (_, filename) => `src:url(${helperOrigin}/vendor/katex/fonts/${filename}) format("woff2")`,
   );
   const source = `${katexSource}\n${rendererTemplate
+    .replace(
+      'const RENDERER_VERSION = "__RENDERER_VERSION__";',
+      `const RENDERER_VERSION = ${JSON.stringify(RENDERER_VERSION)};`,
+    )
     .replace(
       'const APP_LANGUAGE = "__APP_LANGUAGE__";',
       `const APP_LANGUAGE = ${JSON.stringify(appLanguage || "")};`,

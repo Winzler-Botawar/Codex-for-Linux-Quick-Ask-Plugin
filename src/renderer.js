@@ -1,8 +1,27 @@
 (() => {
-  if (window.__codexSelectionExplainerInjected) {
+  const RENDERER_VERSION = "__RENDERER_VERSION__";
+  if (window.__codexSelectionExplainerVersion === RENDERER_VERSION) {
     return;
   }
+
+  // Replace an older renderer in the already-open window without requiring a
+  // full application restart. Old anonymous event handlers are harmless once
+  // this renderer's later-registered handlers remove their stale UI elements.
+  document.querySelectorAll(
+    "#codex-selection-explainer-action, .codex-selection-explainer-window",
+  ).forEach((element) => element.remove());
+  document.querySelectorAll("style").forEach((styleElement) => {
+    const content = styleElement.textContent || "";
+    if (
+      styleElement.dataset.codexSelectionExplainer
+      || content.includes(".codex-selection-explainer-window")
+    ) {
+      styleElement.remove();
+    }
+  });
+
   window.__codexSelectionExplainerInjected = true;
+  window.__codexSelectionExplainerVersion = RENDERER_VERSION;
 
   const BUTTON_ID = "codex-selection-explainer-action";
   const WINDOW_CLASS = "codex-selection-explainer-window";
@@ -204,8 +223,20 @@
   };
   window.__codexSelectionExplainerBridge = bridge;
 
+  const hasBuiltInKatexStyles = Array.from(document.styleSheets).some((sheet) => {
+    try {
+      return Array.from(sheet.cssRules).some((rule) => (
+        String(rule.cssText || "").includes(".katex")
+      ));
+    } catch {
+      return false;
+    }
+  });
+
   const style = document.createElement("style");
-  style.textContent = `${KATEX_CSS}
+  style.dataset.codexSelectionExplainer = RENDERER_VERSION;
+  style.dataset.katexSource = hasBuiltInKatexStyles ? "app" : "bundled";
+  style.textContent = `${hasBuiltInKatexStyles ? "" : KATEX_CSS}
     body, body * {
       -webkit-user-select: text !important;
       user-select: text !important;
@@ -588,10 +619,8 @@
   }
 
   function removeActionButton() {
-    if (actionButton) {
-      actionButton.remove();
-      actionButton = null;
-    }
+    document.querySelectorAll(`#${BUTTON_ID}`).forEach((button) => button.remove());
+    actionButton = null;
     actionSnapshot = null;
   }
 

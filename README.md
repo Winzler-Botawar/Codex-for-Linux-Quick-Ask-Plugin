@@ -1,7 +1,7 @@
 # Codex for Linux Quick Ask Plugin
 
 在 Codex Linux Desktop 中选中文字后快速查看解释的本地插件，当前版本为
-`0.1.1`。
+`0.1.3`。
 
 ## 功能
 <img width="226" height="92" alt="image" src="https://github.com/user-attachments/assets/2a358065-aca1-4d01-b736-5fe3fa081deb" />

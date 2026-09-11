@@ -1,6 +1,6 @@
 {
   "name": "codex-selection-explainer",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Floating explainer for selected text inside Codex Desktop on Linux.",
   "author": {
     "name": "Winzler-Botawar",

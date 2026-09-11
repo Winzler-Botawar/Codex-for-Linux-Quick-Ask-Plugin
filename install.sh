@@ -75,7 +75,7 @@ if ! port_is_free "\$CDP_PORT"; then
 fi
 
 if [ -x "\${CODEX_MANAGED_NODE_RUNTIME_DIR:-}/bin/node" ]; then
-  NODE_BIN="\${CODEX_MANAGED_NODE_RUNTIME_DIR}/bin/node"
+  NODE_BIN="\${CODEX_MANAGED_NODE_RUNTIME_DIR:-}/bin/node"
 elif [ -x "\$HOME/.local/share/codex-desktop/resources/node-runtime/bin/node" ]; then
   NODE_BIN="\$HOME/.local/share/codex-desktop/resources/node-runtime/bin/node"
 elif command -v node >/dev/null 2>&1; then

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.3 - 2026-09-11
+
+- Reused the KaTeX stylesheet already bundled with Codex when it is available.
+- Kept the bundled KaTeX stylesheet as a fallback for builds without native math CSS.
+- Limited the bundled font sources to the installed `woff2` files.
+- Fixed the launcher when `CODEX_MANAGED_NODE_RUNTIME_DIR` is unset.
+
+## 0.1.2 - 2026-09-11
+
+- Fixed formula rendering in Codex windows that still contain an older injected renderer.
+- Added versioned in-page renderer upgrades that replace stale floating UI and styles.
+- Added an explicit renderer version marker and compatible helper replacement.
+
 ## 0.1.1 - 2026-09-11
 
 - Added local KaTeX rendering for inline and display formulas.
